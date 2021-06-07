@@ -10,9 +10,10 @@ import random
 side_count = random.randrange(3, 12)
 height = 4
 side_rads_size = (2*math.pi)/side_count
-down_radius = 2
-up_radius = 1
+down_radius = 1.3
+up_radius = 0.5
 down_vertices = []
+up_vertices = []
 
 
 #Variables for Rotation
@@ -23,7 +24,7 @@ offsetRotationZ = 0.4
 
 
 def draw_pyramid():
-	global currentRotationX, currentRotationY, currentRotationZ, down_vertices
+	global currentRotationX, currentRotationY, currentRotationZ, down_vertices, up_vertices
 
 	glPushMatrix()
 	
@@ -44,12 +45,27 @@ def draw_pyramid():
 		glVertex3f(x,y,0.0)
 	glEnd()
 
+
+
+	# Creating and drawing up vertices
+	glBegin(GL_POLYGON)
+	for i in range(0,side_count):
+		x = up_radius * math.cos(i*side_rads_size)
+		y = up_radius * math.sin(i*side_rads_size)
+		up_vertices += [ (x,y) ]
+		if i == 2:
+			glNormal3fv(calculaNormalFaceTri((up_vertices[0][0], up_vertices[0][1], height), (up_vertices[1][0], up_vertices[1][1], height), (up_vertices[2][0], up_vertices[2][1], height)))
+		glVertex3f(x,y,height)
+	glEnd()
+	
+
 	#Drawing side faces
-	glBegin(GL_TRIANGLES)
+	glBegin(GL_QUADS)
 	for i in range(0,side_count):
 		glNormal3fv(calculaNormalFaceTri( (down_vertices[i][0],down_vertices[i][1],0.0), (0,0,height), (down_vertices[(i+1)%side_count][0],down_vertices[(i+1)%side_count][1],0.0)))
 		glVertex3f(down_vertices[i][0],down_vertices[i][1],0.0)
-		glVertex3f(0,0,height)
+		glVertex3f(up_vertices[i][0],up_vertices[i][1],height)
+		glVertex3f(up_vertices[(i+1)%side_count][0],up_vertices[(i+1)%side_count][1],height)
 		glVertex3f(down_vertices[(i+1)%side_count][0],down_vertices[(i+1)%side_count][1],0.0)
 	glEnd()
 
